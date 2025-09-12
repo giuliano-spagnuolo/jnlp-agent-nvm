@@ -1,5 +1,5 @@
-FROM ubuntu:22.04 as fetcher
-ENV NVM_VERSION v0.39.5
+FROM ubuntu:22.04 AS fetcher
+ENV NVM_VERSION=v0.40.3
 RUN apt-get update && \
     apt-get install -y git && \
     git clone \
@@ -7,7 +7,7 @@ RUN apt-get update && \
         --branch $NVM_VERSION \
         https://github.com/nvm-sh/nvm.git
 
-FROM jenkins/inbound-agent:alpine as jnlp
+FROM jenkins/inbound-agent:alpine AS jnlp
 
 FROM jenkins/agent:latest-jdk17
 
@@ -66,5 +66,10 @@ RUN pnpm config set store-dir /home/jenkins/.local/share/pnpm/store
 
 # Cypress 13.6.3 because of bugs >13.6.3 https://github.com/cypress-io/cypress/issues/27501
 RUN CYPRESS_INSTALL_BINARY=13.6.3 pnpm install -g cypress@13.6.3
+
+USER root
+
+RUN pnpm add -g playwright
+RUN playwright install --with-deps chromium
 
 ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
