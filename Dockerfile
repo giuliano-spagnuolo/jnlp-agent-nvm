@@ -67,4 +67,11 @@ RUN pnpm config set store-dir /home/jenkins/.local/share/pnpm/store
 # Cypress 13.6.3 because of bugs >13.6.3 https://github.com/cypress-io/cypress/issues/27501
 RUN CYPRESS_INSTALL_BINARY=13.6.3 pnpm install -g cypress@13.6.3
 
+USER root
+RUN pnpm add -g playwright
+RUN playwright install --with-deps chromium
+
+USER ${user}
+RUN playwright install chromium
+
 ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
